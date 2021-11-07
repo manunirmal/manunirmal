@@ -7,11 +7,11 @@ from flask import Flask, request, jsonify
 
 app=Flask(__name__)
 
-def check_card(cardName):
+def check_card(card_name):
     """
     This function validates credit card transactions
     """
-    wraps(cardName)
+    wraps(card_name)
     def validation(*args, **kwargs):
         """
     This function is a decorator
@@ -27,7 +27,7 @@ def check_card(cardName):
             "newLimit":data.get("limit"),
             "reason":"Transaction above limit"}
             return jsonify(response)
-        return f(*args, **kwargs)
+        return card_name(*args, **kwargs)
     return validation
 
 @app.route("/api/transaction",methods=["POST"])
@@ -44,4 +44,3 @@ def transaction():
 
 if __name__ =='__main__':
     app.run(debug=True)
-    
