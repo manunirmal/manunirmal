@@ -1,31 +1,42 @@
 #!/usr/bin/python3
-
-from flask import Flask, request, jsonify
+"""
+This code is used as an example
+"""
 from functools import wraps
+from flask import Flask, request, jsonify
 
 app=Flask(__name__)
 
-def check_card(f):
-    wraps(f)
+def check_card(cardName):
+    """
+    This function validates credit card transactions
+    """
+    wraps(cardName)
     def validation(*args, **kwargs):
-        data=request.get_json();
+        """
+    This function is a decorator
+    """
+        data=request.get_json()
         if not data.get("status"):
             response={"approved":False,
             "newLimit":data.get("limit"),
             "reason":"Blocked card"}
             return jsonify(response)
-        if(data.get("limit") < data.get("transaction").get("amoount")):
+        if data.get("limit") < data.get("transaction").get("amoount"):
             response={"approved":False,
             "newLimit":data.get("limit"),
             "reason":"Transaction above limit"}
             return jsonify(response)
         return f(*args, **kwargs)
-    return (validation)
+    return validation
 
 @app.route("/api/transaction",methods=["POST"])
 @check_card
 
 def transaction():
+    """
+    This function is responsible for exposing the endpoint for receiving requests
+    """
     card = request.get_json()
     new_limit = card.get("limit")- card.get("transaction").get("amoount")
     response={"approved":True,"newLimit":new_limit}
@@ -33,3 +44,4 @@ def transaction():
 
 if __name__ =='__main__':
     app.run(debug=True)
+    
