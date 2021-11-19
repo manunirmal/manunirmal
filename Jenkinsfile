@@ -3,22 +3,27 @@ pipeline{
   stages {
     stage('Preparing the environment'){
       steps {
-        echo 'preparing environment'
+        sh 'python3 -l pip install -r requirements.txt'
       }
     }
     stage('Code Quality'){
       steps {
-        echo 'checking code quality'
+        sh 'python3 -m pylint app.py'
       }
     }
     stage('Tests'){
       steps {
-        echo 'testing application'
+        echo 'python3 -m pytest'
       }
     }
     stage('Build'){
+      agent{
+        node{
+          label "DockerServer";
+        }
+      }
       steps {
-        echo 'building application'
+        sh 'docker build https://github.com/manunirmal/manunirmal.git -t manunirmal:latest'
       }
     }
     stage('Delivery'){
@@ -27,8 +32,13 @@ pipeline{
       }
     }
     stage('Deploy'){
+      agent{
+        node{
+          label "DockerServer";
+        }
+      }
       steps {
-        echo 'deploying the application'
+        sh 'docker run -tdi -p 5000:5000 manunirmal:latest'
       }
     }
   }
